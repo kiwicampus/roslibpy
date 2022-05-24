@@ -15,6 +15,9 @@ from twisted.python import log
 
 from ..event_emitter import EventEmitterMixin
 from . import RosBridgeProtocol
+import cbor2
+import json
+import struct
 
 LOGGER = logging.getLogger('roslibpy')
 
@@ -33,10 +36,21 @@ class AutobahnRosBridgeProtocol(RosBridgeProtocol, WebSocketClientProtocol):
 
     def onMessage(self, payload, isBinary):
         if isBinary:
-            raise NotImplementedError('Add support for binary messages')
+            ascii_payload = cbor2.decoder.loads(payload)
+            ascii_payload["msg"]["data"] = list(
+                struct.unpack(
+                    f">{len(ascii_payload['msg']['data'].value)}b",
+                    ascii_payload["msg"]["data"].value,
+                )
+            )
+            # print(ascii_payload)
+            a = str(ascii_payload).replace('"', "'").encode("utf-8")
+            self.on_message(ascii_payload)
+            # raise NotImplementedError('Add support for binary messages')
+            return
 
         try:
-            self.on_message(payload)
+            self.on_message(json.loads(payload.decode("utf8")))
         except Exception:
             LOGGER.exception('Exception on start_listening while trying to handle message received.' +
                              'It could indicate a bug in user code on message handlers. Message skipped.')

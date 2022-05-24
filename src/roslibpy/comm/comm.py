@@ -30,7 +30,7 @@ class RosBridgeProtocol(object):
         # TODO: add handlers for op: status
 
     def on_message(self, payload):
-        message = Message(json.loads(payload.decode('utf8')))
+        message = Message(payload)
         handler = self._message_handlers.get(message['op'], None)
         if not handler:
             raise RosBridgeException(
