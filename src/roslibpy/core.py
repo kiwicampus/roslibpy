@@ -138,7 +138,7 @@ class Topic(object):
         queue_length (:obj:`int`): Queue length at bridge side used when subscribing.
         reconnect_on_close (:obj:`bool`): Reconnect the topic (both for publisher and subscribers) if a reconnection is detected.
     """
-    SUPPORTED_COMPRESSION_TYPES = ('png', 'none')
+    SUPPORTED_COMPRESSION_TYPES = ('png', 'cbor', 'none')
 
     def __init__(self, ros, name, message_type, compression=None, latch=False, throttle_rate=0,
                  queue_size=100, queue_length=0, reconnect_on_close=True):
